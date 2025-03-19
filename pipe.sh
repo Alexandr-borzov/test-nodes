@@ -37,18 +37,18 @@ print_menu() {
     clear
 
     echo -e "\n${BOLD}${WHITE}╔════════════════════════════════════════╗${NC}"
-    echo -e "${BOLD}${WHITE}║        🚀 PIPE NODE MANAGER           ║${NC}"
+    echo -e "${BOLD}${WHITE}║        🚀 PIPE NODE MANAGER            ║${NC}"
     echo -e "${BOLD}${WHITE}╚════════════════════════════════════════╝${NC}\n"
 
     echo -e "${BOLD}${BLUE}🔧 Доступные действия:${NC}\n"
-    echo -e "${WHITE}[${CYAN}1${WHITE}] ${GREEN}➜ ${WHITE}🛠️  Установка ноды${NC}"
-    echo -e "${WHITE}[${CYAN}2${WHITE}] ${GREEN}➜ ${WHITE}📋 Проверка статуса${NC}"
-    echo -e "${WHITE}[${CYAN}3${WHITE}] ${GREEN}➜ ${WHITE}📜 Просмотр логов${NC}"
-    echo -e "${WHITE}[${CYAN}4${WHITE}] ${GREEN}➜ ${WHITE}💰 Проверка поинтов${NC}"
-    echo -e "${WHITE}[${CYAN}5${WHITE}] ${GREEN}➜ ${WHITE}🔄 Обновление ноды${NC}"
-    echo -e "${WHITE}[${CYAN}6${WHITE}] ${GREEN}➜ ${WHITE}🗑️  Удаление ноды${NC}"
-    echo -e "${WHITE}[${CYAN}7${WHITE}] ${GREEN}➜ ${WHITE}📋  Просмотр рефрального кода${NC}"
-    echo -e "${WHITE}[${CYAN}8${WHITE}] ${GREEN}➜ ${WHITE}🚪 Выход${NC}\n"
+    echo -e "${WHITE}[${CYAN}1${WHITE}] ${GREEN}➜ ${WHITE}  Установка ноды${NC}"
+    echo -e "${WHITE}[${CYAN}2${WHITE}] ${GREEN}➜ ${WHITE}  Проверка статуса${NC}"
+    echo -e "${WHITE}[${CYAN}3${WHITE}] ${GREEN}➜ ${WHITE}  Просмотр логов${NC}"
+    echo -e "${WHITE}[${CYAN}4${WHITE}] ${GREEN}➜ ${WHITE}  Проверка поинтов${NC}"
+    echo -e "${WHITE}[${CYAN}5${WHITE}] ${GREEN}➜ ${WHITE}  Обновление ноды${NC}"
+    echo -e "${WHITE}[${CYAN}6${WHITE}] ${GREEN}➜ ${WHITE}  Удаление ноды${NC}"
+    echo -e "${WHITE}[${CYAN}7${WHITE}] ${GREEN}➜ ${WHITE}  Просмотр рефрального кода${NC}"
+    echo -e "${WHITE}[${CYAN}8${WHITE}] ${GREEN}➜ ${WHITE}  Выход${NC}\n"
 }
 
 # Функция для обработки CTRL+C
@@ -91,7 +91,7 @@ install_node() {
     read -p "pubKey: " pubKey
 
     # Создаем .env файл с введенными данными
-    echo -e "ram=$ram\nmax-disk=$max_disk\ncache-dir=$HOME/pipenetwork/download_cache\npubKey=$pubKey" > $HOME/pipenetwork/.env
+    echo -e "ram=$ram\nmax-disk=$max_disk\ncache-dir=$HOME/pipenetwork/download_cache\npubKey=$pubKey\n--signup-by-referral-route\n2dc306bb83b1e3d2" > $HOME/pipenetwork/.env
 
     # Создание и запуск сервисного файла
     USERNAME=$(whoami)
