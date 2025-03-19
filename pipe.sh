@@ -19,17 +19,17 @@ fi
 
 # Функция для отображения успешных сообщений
 success_message() {
-    echo -e "${GREEN}[✅] $1${NC}"
+    echo -e "${GREEN}[] $1${NC}"
 }
 
 # Функция для отображения информационных сообщений
 info_message() {
-    echo -e "${CYAN}[ℹ️] $1${NC}"
+    echo -e "${CYAN}[️] $1${NC}"
 }
 
 # Функция для отображения ошибок
 error_message() {
-    echo -e "${RED}[❌] $1${NC}"
+    echo -e "${RED}[] $1${NC}"
 }
 
 # Функция для отображения меню
@@ -37,10 +37,10 @@ print_menu() {
     clear
 
     echo -e "\n${BOLD}${WHITE}╔════════════════════════════════════════╗${NC}"
-    echo -e "${BOLD}${WHITE}║        🚀 PIPE NODE MANAGER            ║${NC}"
+    echo -e "${BOLD}${WHITE}║          PIPE NODE MANAGER            ║${NC}"
     echo -e "${BOLD}${WHITE}╚════════════════════════════════════════╝${NC}\n"
 
-    echo -e "${BOLD}${BLUE}🔧 Доступные действия:${NC}\n"
+    echo -e "${BOLD}${BLUE} Доступные действия:${NC}\n"
     echo -e "${WHITE}[${CYAN}1${WHITE}] ${GREEN}➜ ${WHITE}  Установка ноды${NC}"
     echo -e "${WHITE}[${CYAN}2${WHITE}] ${GREEN}➜ ${WHITE}  Проверка статуса${NC}"
     echo -e "${WHITE}[${CYAN}3${WHITE}] ${GREEN}➜ ${WHITE}  Просмотр логов${NC}"
@@ -67,20 +67,20 @@ install_dependencies() {
 
 # Функция для установки ноды
 install_node() {
-    echo -e "\n${BOLD}${BLUE}⚡ Установка ноды Pipe...${NC}\n"
+    echo -e "\n${BOLD}${BLUE} Установка ноды Pipe...${NC}\n"
 
-    echo -e "${WHITE}[${CYAN}1/5${WHITE}] ${GREEN}➜ ${WHITE}🔄 Установка зависимостей...${NC}"
+    echo -e "${WHITE}[${CYAN}1/5${WHITE}] ${GREEN}➜ ${WHITE} Установка зависимостей...${NC}"
     install_dependencies
 
-    echo -e "${WHITE}[${CYAN}2/5${WHITE}] ${GREEN}➜ ${WHITE}📂 Создание директории...${NC}"
+    echo -e "${WHITE}[${CYAN}2/5${WHITE}] ${GREEN}➜ ${WHITE} Создание директории...${NC}"
     mkdir -p ~/pipenetwork/download_cache
     cd ~/pipenetwork
 
-    echo -e "${WHITE}[${CYAN}3/5${WHITE}] ${GREEN}➜ ${WHITE}📥 Загрузка файлов...${NC}"
+    echo -e "${WHITE}[${CYAN}3/5${WHITE}] ${GREEN}➜ ${WHITE} Загрузка файлов...${NC}"
     wget https://dl.pipecdn.app/v0.2.8/pop
     chmod +x pop
 
-    echo -e "${WHITE}[${CYAN}4/5${WHITE}] ${GREEN}➜ ${WHITE}⚙️ Настройка параметров...${NC}"
+    echo -e "${WHITE}[${CYAN}4/5${WHITE}] ${GREEN}➜ ${WHITE}️ Настройка параметров...${NC}"
 
     # Создание .env файла
     echo -e "${YELLOW}Введите количество оперативной памяти для ноды [Если хотите выделить 8 GB, то напишите 8]:${NC}"
@@ -91,7 +91,7 @@ install_node() {
     read -p "pubKey: " pubKey
 
     # Создаем .env файл с введенными данными
-    echo -e "ram=$ram\nmax-disk=$max_disk\ncache-dir=$HOME/pipenetwork/download_cache\npubKey=$pubKey\n--signup-by-referral-route\n2dc306bb83b1e3d2" > $HOME/pipenetwork/.env
+    echo -e "ram=$ram\nmax-disk=$max_disk\ncache-dir=$HOME/pipenetwork/download_cache\npubKey=$pubKey\n--signup-by-referral-route\nb0da2042257c9562" > $HOME/pipenetwork/.env
 
     # Создание и запуск сервисного файла
     USERNAME=$(whoami)
@@ -130,7 +130,7 @@ EOF
     sudo systemctl start pipe-pop
 
     echo -e "\n${PURPLE}═════════════════════════════════════════════${NC}"
-    echo -e "${GREEN}✨ Нода успешно установлена и запущена!${NC}"
+    echo -e "${GREEN}  Нода успешно установлена и запущена!${NC}"
     echo -e "${PURPLE}═════════════════════════════════════════════${NC}\n"
 
     sleep 3
@@ -139,7 +139,7 @@ EOF
 
 # Функция для проверки статуса
 check_status() {
-    echo -e "\n${BOLD}${BLUE}📋 Проверка статуса ноды...${NC}\n"
+    echo -e "\n${BOLD}${BLUE} Проверка статуса ноды...${NC}\n"
     cd ~/pipenetwork
     ./pop --status
     cd ..
@@ -150,7 +150,7 @@ check_status() {
 
 # Функция для просмотра логов
 view_logs() {
-    echo -e "\n${BOLD}${BLUE}📜 Просмотр логов Pipe...${NC}\n"
+    echo -e "\n${BOLD}${BLUE} Просмотр логов Pipe...${NC}\n"
 
     # Установка обработчика CTRL+C
     trap ctrl_c_handler INT
@@ -166,7 +166,7 @@ view_logs() {
 
 # Функция для проверки поинтов
 check_points() {
-    echo -e "\n${BOLD}${BLUE}💰 Проверка поинтов ноды...${NC}\n"
+    echo -e "\n${BOLD}${BLUE} Проверка поинтов ноды...${NC}\n"
     cd ~/pipenetwork
     ./pop --points
     cd ..
@@ -177,7 +177,7 @@ check_points() {
 
 # Функция для обновления ноды
 update_node() {
-    echo -e "\n${BOLD}${BLUE}🔄 Обновление ноды Pipe...${NC}\n"
+    echo -e "\n${BOLD}${BLUE} Обновление ноды Pipe...${NC}\n"
     sudo systemctl stop pipe-pop
     rm -f $HOME/pipenetwork/pop
     curl -o $HOME/pipenetwork/pop https://dl.pipecdn.app/v0.2.8/pop
@@ -198,27 +198,27 @@ update_node() {
 
 # Функция для удаления ноды
 remove_node() {
-    echo -e "\n${BOLD}${RED}⚠️ Удаление ноды Pipe...${NC}\n"
+    echo -e "\n${BOLD}${RED}️ Удаление ноды Pipe...${NC}\n"
 
-    echo -e "${WHITE}[${CYAN}1/3${WHITE}] ${GREEN}➜ ${WHITE}🛑 Остановка сервиса...${NC}"
+    echo -e "${WHITE}[${CYAN}1/3${WHITE}] ${GREEN}➜ ${WHITE} Остановка сервиса...${NC}"
     sudo systemctl stop pipe-pop
     sudo systemctl disable pipe-pop
 
-    echo -e "${WHITE}[${CYAN}2/3${WHITE}] ${GREEN}➜ ${WHITE}🗑️ Удаление файлов...${NC}"
+    echo -e "${WHITE}[${CYAN}2/3${WHITE}] ${GREEN}➜ ${WHITE}️ Удаление файлов...${NC}"
     sudo rm -rf ~/pipenetwork
 
-    echo -e "${WHITE}[${CYAN}3/3${WHITE}] ${GREEN}➜ ${WHITE}🗑️ Удаление сервисного файла...${NC}"
+    echo -e "${WHITE}[${CYAN}3/3${WHITE}] ${GREEN}➜ ${WHITE}️ Удаление сервисного файла...${NC}"
     sudo rm /etc/systemd/system/pipe-pop.service
     sudo systemctl daemon-reload
 
-    echo -e "\n${GREEN}✅ Нода успешно удалена!${NC}\n"
+    echo -e "\n${GREEN} Нода успешно удалена!${NC}\n"
     sleep 3
     print_menu
 }
 
 # Функция для получения реф кода
 check_ref() {
-    echo -e "\n${BOLD}${BLUE}💰 Ваш рефральный код...${NC}\n"
+    echo -e "\n${BOLD}${BLUE} Ваш рефральный код...${NC}\n"
     cd ~/pipenetwork
     ./pop --gen-referral-route
     cd ..
@@ -230,7 +230,7 @@ check_ref() {
 # Основной цикл программы
 while true; do
     print_menu
-    echo -e "${BOLD}${BLUE}📝 Введите номер действия [1-7]:${NC} "
+    echo -e "${BOLD}${BLUE} Введите номер действия [1-7]:${NC} "
     read -p "➜ " choice
 
     case $choice in
@@ -256,11 +256,11 @@ while true; do
             check_ref
             ;;
         8)
-            echo -e "\n${GREEN}👋 До свидания!${NC}\n"
+            echo -e "\n${GREEN} До свидания!${NC}\n"
             exit 0
             ;;
         *)
-            echo -e "\n${RED}❌ Ошибка: Неверный выбор! Пожалуйста, введите номер от 1 до 7.${NC}\n"
+            echo -e "\n${RED} Ошибка: Неверный выбор! Пожалуйста, введите номер от 1 до 7.${NC}\n"
             sleep 2
             print_menu
             ;;
