@@ -37,7 +37,7 @@ print_menu() {
     clear
 
     echo -e "\n${BOLD}${WHITE}╔════════════════════════════════════════╗${NC}"
-    echo -e "${BOLD}${WHITE}║          PIPE NODE MANAGER              ║${NC}"
+    echo -e "${BOLD}${WHITE}║          PIPE NODE MANAGER             ║${NC}"
     echo -e "${BOLD}${WHITE}╚════════════════════════════════════════╝${NC}\n"
 
     echo -e "${BOLD}${BLUE} Доступные действия:${NC}\n"
@@ -260,7 +260,7 @@ while true; do
             exit 0
             ;;
         *)
-            echo -e "\n${RED} Ошибка: Неверный выбор! Пожалуйста, введите номер от 1 до 7.${NC}\n"
+            echo -e "\n${RED} Ошибка: Неверный выбор! Пожалуйста, введите номер от 1 до 8.${NC}\n"
             sleep 2
             print_menu
             ;;
