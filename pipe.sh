@@ -230,7 +230,7 @@ check_ref() {
 # Основной цикл программы
 while true; do
     print_menu
-    echo -e "${BOLD}${BLUE} Введите номер действия [1-7]:${NC} "
+    echo -e "${BOLD}${BLUE} Введите номер действия [1-8]:${NC} "
     read -p "➜ " choice
 
     case $choice in
