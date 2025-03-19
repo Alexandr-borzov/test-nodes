@@ -37,7 +37,7 @@ print_menu() {
     clear
 
     echo -e "\n${BOLD}${WHITE}╔════════════════════════════════════════╗${NC}"
-    echo -e "${BOLD}${WHITE}║          PIPE NODE MANAGER             ║${NC}"
+    echo -e "${BOLD}${WHITE}║          PIPE NODE MANAGER              ║${NC}"
     echo -e "${BOLD}${WHITE}╚════════════════════════════════════════╝${NC}\n"
 
     echo -e "${BOLD}${BLUE} Доступные действия:${NC}\n"
