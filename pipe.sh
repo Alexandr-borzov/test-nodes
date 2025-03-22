@@ -11,25 +11,22 @@ WHITE='\033[1;37m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-# Проверка наличия curl и установка, если не установлен
-if ! command -v curl &> /dev/null; then
-    sudo apt update
-    sudo apt install curl -y
-fi
+# Определение рабочей директории
+WORK_DIR="$HOME/nodes/pipe"
 
 # Функция для отображения успешных сообщений
 success_message() {
-    echo -e "${GREEN}[] $1${NC}"
+    echo -e "${GREEN}[✔] $1${NC}"
 }
 
 # Функция для отображения информационных сообщений
 info_message() {
-    echo -e "${CYAN}[️] $1${NC}"
+    echo -e "${CYAN}[ℹ️] $1${NC}"
 }
 
 # Функция для отображения ошибок
 error_message() {
-    echo -e "${RED}[] $1${NC}"
+    echo -e "${RED}[✘] $1${NC}"
 }
 
 # Функция для отображения меню
@@ -39,6 +36,19 @@ print_menu() {
     echo -e "\n${BOLD}${WHITE}╔════════════════════════════════════════╗${NC}"
     echo -e "${BOLD}${WHITE}║          PIPE NODE MANAGER             ║${NC}"
     echo -e "${BOLD}${WHITE}╚════════════════════════════════════════╝${NC}\n"
+
+    # Проверка статуса ноды
+    if is_node_installed; then
+        if systemctl is-active --quiet pipe-pop; then
+            NODE_STATUS="${GREEN}Запущена${NC}"
+        else
+            NODE_STATUS="${RED}Остановлена${NC}"
+        fi
+    else
+        NODE_STATUS="${YELLOW}Не установлена${NC}"
+    fi
+
+    echo -e "${BOLD}${BLUE} Статус ноды: $NODE_STATUS${NC}\n"
 
     echo -e "${BOLD}${BLUE} Доступные действия:${NC}\n"
     echo -e "${WHITE}[${CYAN}1${WHITE}] ${GREEN}➜ ${WHITE}  Установка ноды${NC}"
@@ -58,23 +68,56 @@ ctrl_c_handler() {
     return
 }
 
-# Функция установки зависимостей
+# Функция для проверки наличия curl и установки, если не установлен
 install_dependencies() {
     info_message "Установка необходимых пакетов..."
-    sudo apt update && sudo apt install -y curl wget
+    sudo apt update && sudo apt install -y curl wget lsof
     success_message "Зависимости установлены"
+}
+
+# Функция для проверки занятости портов
+check_ports() {
+    PORT=8003
+    if lsof -i :$PORT > /dev/null 2>&1; then
+        error_message "Порт $PORT уже занят другим процессом."
+        info_message "Вы можете остановить процесс или изменить порт в конфигурации."
+        read -p "Хотите продолжить установку? (y/n): " choice
+        if [[ "$choice" != "y" ]]; then
+            print_menu
+            return 1
+        fi
+    else
+        success_message "Порт $PORT свободен."
+    fi
+}
+
+# Функция для проверки, установлена ли нода
+is_node_installed() {
+    if [ -f "$WORK_DIR/pop" ]; then
+        return 0 # Нода установлена
+    else
+        return 1 # Нода не установлена
+    fi
+}
+
+# Функция для включения автозапуска ноды
+enable_autostart() {
+    sudo systemctl enable pipe-pop
+    success_message "Автозапуск ноды включен"
 }
 
 # Функция для установки ноды
 install_node() {
+    check_ports || return # Если порт занят и пользователь отказался, выходим
+
     echo -e "\n${BOLD}${BLUE} Установка ноды Pipe...${NC}\n"
 
     echo -e "${WHITE}[${CYAN}1/5${WHITE}] ${GREEN}➜ ${WHITE} Установка зависимостей...${NC}"
     install_dependencies
 
     echo -e "${WHITE}[${CYAN}2/5${WHITE}] ${GREEN}➜ ${WHITE} Создание директории...${NC}"
-    mkdir -p ~/pipenetwork/download_cache
-    cd ~/pipenetwork
+    mkdir -p $WORK_DIR/download_cache
+    cd $WORK_DIR
 
     echo -e "${WHITE}[${CYAN}3/5${WHITE}] ${GREEN}➜ ${WHITE} Загрузка файлов...${NC}"
     wget https://dl.pipecdn.app/v0.2.8/pop
@@ -91,7 +134,7 @@ install_node() {
     read -p "pubKey: " pubKey
 
     # Создаем .env файл с введенными данными
-    echo -e "ram=$ram\nmax-disk=$max_disk\ncache-dir=$HOME/pipenetwork/download_cache\npubKey=$pubKey\n--signup-by-referral-route\nb0da2042257c9562" > $HOME/pipenetwork/.env
+    echo -e "ram=$ram\nmax-disk=$max_disk\ncache-dir=$WORK_DIR/download_cache\npubKey=$pubKey\n--signup-by-referral-route\nb0da2042257c9562" > $WORK_DIR/.env
 
     # Создание и запуск сервисного файла
     USERNAME=$(whoami)
@@ -105,11 +148,11 @@ Wants=network-online.target
 [Service]
 User=$USERNAME
 Group=$USERNAME
-WorkingDirectory=$HOME_DIR/pipenetwork
-ExecStart=$HOME_DIR/pipenetwork/pop \\
+WorkingDirectory=$WORK_DIR
+ExecStart=$WORK_DIR/pop \\
     --ram $ram \\
     --max-disk $max_disk \\
-    --cache-dir $HOME_DIR/pipenetwork/download_cache \\
+    --cache-dir $WORK_DIR/download_cache \\
     --pubKey $pubKey
 Restart=always
 RestartSec=5
@@ -126,7 +169,7 @@ EOF
     # Перезагрузка и запуск сервиса
     sudo systemctl daemon-reload
     sleep 1
-    sudo systemctl enable pipe-pop
+    enable_autostart
     sudo systemctl start pipe-pop
 
     echo -e "\n${PURPLE}═════════════════════════════════════════════${NC}"
@@ -139,8 +182,15 @@ EOF
 
 # Функция для проверки статуса
 check_status() {
+    if ! is_node_installed; then
+        error_message "Нода не установлена. Пожалуйста, установите её сначала."
+        sleep 2
+        print_menu
+        return
+    fi
+
     echo -e "\n${BOLD}${BLUE} Проверка статуса ноды...${NC}\n"
-    cd ~/pipenetwork
+    cd $WORK_DIR
     ./pop --status
     cd ..
 
@@ -150,6 +200,13 @@ check_status() {
 
 # Функция для просмотра логов
 view_logs() {
+    if ! is_node_installed; then
+        error_message "Нода не установлена. Пожалуйста, установите её сначала."
+        sleep 2
+        print_menu
+        return
+    fi
+
     echo -e "\n${BOLD}${BLUE} Просмотр логов Pipe...${NC}\n"
 
     # Установка обработчика CTRL+C
@@ -166,8 +223,15 @@ view_logs() {
 
 # Функция для проверки поинтов
 check_points() {
+    if ! is_node_installed; then
+        error_message "Нода не установлена. Пожалуйста, установите её сначала."
+        sleep 2
+        print_menu
+        return
+    fi
+
     echo -e "\n${BOLD}${BLUE} Проверка поинтов ноды...${NC}\n"
-    cd ~/pipenetwork
+    cd $WORK_DIR
     ./pop --points
     cd ..
 
@@ -177,12 +241,19 @@ check_points() {
 
 # Функция для обновления ноды
 update_node() {
+    if ! is_node_installed; then
+        error_message "Нода не установлена. Пожалуйста, установите её сначала."
+        sleep 2
+        print_menu
+        return
+    fi
+
     echo -e "\n${BOLD}${BLUE} Обновление ноды Pipe...${NC}\n"
     sudo systemctl stop pipe-pop
-    rm -f $HOME/pipenetwork/pop
-    curl -o $HOME/pipenetwork/pop https://dl.pipecdn.app/v0.2.8/pop
-    chmod +x $HOME/pipenetwork/pop
-    $HOME/pipenetwork/pop --refresh
+    rm -f $WORK_DIR/pop
+    curl -o $WORK_DIR/pop https://dl.pipecdn.app/v0.2.8/pop
+    chmod +x $WORK_DIR/pop
+    $WORK_DIR/pop --refresh
 
     # Установка обработчика CTRL+C
     trap ctrl_c_handler INT
@@ -198,6 +269,13 @@ update_node() {
 
 # Функция для удаления ноды
 remove_node() {
+    if ! is_node_installed; then
+        error_message "Нода не установлена. Пожалуйста, установите её сначала."
+        sleep 2
+        print_menu
+        return
+    fi
+
     echo -e "\n${BOLD}${RED}️ Удаление ноды Pipe...${NC}\n"
 
     echo -e "${WHITE}[${CYAN}1/3${WHITE}] ${GREEN}➜ ${WHITE} Остановка сервиса...${NC}"
@@ -205,7 +283,7 @@ remove_node() {
     sudo systemctl disable pipe-pop
 
     echo -e "${WHITE}[${CYAN}2/3${WHITE}] ${GREEN}➜ ${WHITE}️ Удаление файлов...${NC}"
-    sudo rm -rf ~/pipenetwork
+    sudo rm -rf $WORK_DIR
 
     echo -e "${WHITE}[${CYAN}3/3${WHITE}] ${GREEN}➜ ${WHITE}️ Удаление сервисного файла...${NC}"
     sudo rm /etc/systemd/system/pipe-pop.service
@@ -218,8 +296,15 @@ remove_node() {
 
 # Функция для получения реф кода
 check_ref() {
+    if ! is_node_installed; then
+        error_message "Нода не установлена. Пожалуйста, установите её сначала."
+        sleep 2
+        print_menu
+        return
+    fi
+
     echo -e "\n${BOLD}${BLUE} Ваш рефральный код...${NC}\n"
-    cd ~/pipenetwork
+    cd $WORK_DIR
     ./pop --gen-referral-route
     cd ..
 
